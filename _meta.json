@@ -1,0 +1,1 @@
+{\n  "name": "budgetsentry",\n  "version": "1.0.0",\n  "description": "Autonomous budget and token usage controller for Aira.",\n  "author": "AiraEliteAgent",\n  "entry": "src/index.js",\n  "commands": {\n    "budgetsentry": "bin/budgetsentry"\n  }\n}
