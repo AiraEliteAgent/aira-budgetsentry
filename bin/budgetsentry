@@ -17,13 +17,14 @@ program
   .description('Show current budget status')
   .action(async () => {
     try {
+      await interceptor.init();
       const status = await interceptor.getStatus();
-      console.log('\n--- 💰 💰 AIRA FINANCIAL COMMAND CENTER ---');
+      console.log('\n--- 💰 AIRA FINANCIAL COMMAND CENTER ---');
       console.log(`Today's Spend: $${status.spent.toFixed(4)}`);
       console.log(`Daily Limit:   $${status.limit.toFixed(2)}`);
       console.log(`Remaining:     $${status.remaining.toFixed(4)}`);
       console.log(`Usage:         ${status.percent.toFixed(1)}%`);
-      console.log('------------------------\n');
+      console.log('----------------------------------------\n');
       process.exit(0);
     } catch (err) {
       console.error('Error:', err.message);
@@ -74,7 +75,7 @@ program
 
 program
   .command('log-usage')
-  .description('Manually log usage (for testing)')
+  .description('Manually log usage')
   .argument('<model>', 'Model name')
   .argument('<in>', 'Input tokens')
   .argument('<out>', 'Output tokens')

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { exec } = require('child_process');
+const { execSync } = require('child_process');
 const path = require('path');
 
 const sessionsDir = path.join(process.env.HOME, '.openclaw/agents/main/sessions');
@@ -17,23 +17,22 @@ function getLatestLogFile() {
 
 function sync() {
   const logFile = getLatestLogFile();
-  if (!logFile) {
-    console.log('No session logs found.');
-    return;
+  if (!logFile) return;
+
+  let lastProcessedFile = "";
+  let lastProcessedLine = 0;
+
+  if (fs.existsSync(stateFile)) {
+    try {
+      const state = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+      lastProcessedFile = state.file;
+      lastProcessedLine = state.line || 0;
+    } catch(e) {}
   }
 
   const data = fs.readFileSync(logFile, 'utf8');
   const lines = data.split('\n').filter(l => l.trim() !== '');
   
-  let lastProcessedLine = 0;
-  if (fs.existsSync(stateFile)) {
-    const state = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-    // If the file has changed (different session), reset pointer
-    if (state.file === logFile) {
-      lastProcessedLine = state.line || 0;
-    }
-  }
-
   let totalIn = 0, totalOut = 0;
   for (let i = lastProcessedLine; i < lines.length; i++) {
     try {
@@ -41,20 +40,19 @@ function sync() {
       if (json.message && json.message.usage) {
         totalIn += json.message.usage.input || 0;
         totalOut += json.message.usage.output || 0;
+      } else if (json.usage) {
+        totalIn += json.usage.input || 0;
+        totalOut += json.usage.output || 0;
       }
     } catch(e) {}
   }
 
-  if (totalIn > 0) {
-    const cmd = `node ${path.join(__dirname, '../../bin/budgetsentry')} log-usage gemini-3-pro ${totalIn} ${totalOut}`;
-    exec(cmd, (err) => {
-       if (!err) {
-         fs.writeFileSync(stateFile, JSON.stringify({ file: logFile, line: lines.length }));
-         console.log(`✅ Synced from ${path.basename(logFile)}: ${totalIn} in, ${totalOut} out.`);
-       }
-    });
-  } else {
-    console.log(`No new tokens in ${path.basename(logFile)}.`);
+  if (totalIn > 0 || lastProcessedFile !== logFile) {
+    try {
+      const budgetsentryBin = path.join(__dirname, '../../bin/budgetsentry');
+      execSync(`node ${budgetsentryBin} log-usage gemini-3-pro ${totalIn} ${totalOut}`);
+      fs.writeFileSync(stateFile, JSON.stringify({ file: logFile, line: lines.length }));
+    } catch (err) {}
   }
 }
 
