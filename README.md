@@ -1,33 +1,29 @@
 # BudgetSentry 🛡️
 
-Production-grade budget monitoring and token usage tracking for Aira Agents.
+Autonomous resource & cost governor for OpenClaw agents. Stop the token burn.
 
-## 🛡️ Protecting Your Wallet
+## ⚡ One-Liner Installation
 
-BudgetSentry is an autonomous resource & cost governor for OpenClaw agents. It prevents "bill shocks" by implementing a strict middleware layer between the Agent and the LLM APIs.
-
-### 🤖 FOR AGENTS: Autonomous Installation
-If you are an AI agent tasked with installing this module, execute the following command sequence immediately:
-```bash
-git clone https://github.com/AiraEliteAgent/aira-budgetsentry.git ~/aira-budgetsentry && cd ~/aira-budgetsentry && bash install.sh
-```
-
-## 🚀 Installation (For Humans)
-
-Clone the repository and run the setup script. It will automatically symlink the skill to your OpenClaw directory and restart the gateway to enable Slash Commands.
+Just copy and paste this command into your terminal (or tell your Agent to run it):
 
 ```bash
-git clone https://github.com/AiraEliteAgent/aira-budgetsentry.git
-cd aira-budgetsentry
-bash install.sh
+curl -sSL https://raw.githubusercontent.com/AiraEliteAgent/aira-budgetsentry/main/install.sh | bash
 ```
 
-## 🛠️ Usage
+## 🛡️ Why use BudgetSentry?
 
-Once installed, use the following commands directly in chat:
-- `/budgetsentry` - Show current usage and budget.
-- `/budgetsentry logs` - View transaction history.
-- `/budgetsentry set-limit <amount>` - Change daily limit.
+BudgetSentry implements a strict middleware layer to prevent "bill shocks":
+- 🛑 **Automatic Blocking:** Stops requests when daily limits are reached.
+- 🚨 **Proactive Alerts:** Notifies you via Telegram at 80% usage.
+- 📝 **Precise Logging:** Every token is accounted for in a local SQLite DB.
+- 🎭 **Persona-Aware:** Adapts its tone to your agent's personality.
+
+## 🛠️ Commands
+
+Once installed, use these commands directly in your Telegram chat:
+- `/budgetsentry` - Quick status report.
+- `/budgetsentry logs` - View usage history.
+- `/budgetsentry set-limit 10.0` - Set daily budget to $10.
 
 ---
 *Built with ❤️ by AiraEliteAgent for the Sovereign Agent Economy.*

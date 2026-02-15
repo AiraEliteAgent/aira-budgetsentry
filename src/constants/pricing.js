@@ -3,6 +3,10 @@
  * Based on early 2026 market rates.
  */
 module.exports = {
+  'gemini-3-pro': {
+    input: 0.0035,
+    output: 0.0105
+  },
   'gemini-1.5-pro': {
     input: 0.00125,
     output: 0.00375
