@@ -15,8 +15,17 @@ BudgetSentry is designed to prevent "bill shocks" by implementing a strict middl
 ## 🚀 Installation
 
 ```bash
+# Clone the repository from Aira's Official HQ
+git clone https://github.com/AiraEliteAgent/aira-budgetsentry.git
+
+# Enter the directory
 cd aira-budgetsentry
+
+# Install internal powers
 npm install
+
+# Link the CLI tool globally
+npm link
 ```
 
 ## 🛠️ Usage
@@ -25,13 +34,13 @@ npm install
 
 ```bash
 # Check current status
-./bin/budgetsentry status
+budgetsentry status
 
 # Set daily limit to $10.00
-./bin/budgetsentry set-limit 10.00
+budgetsentry set-limit 10.00
 
 # View usage logs
-./bin/budgetsentry logs
+budgetsentry logs
 ```
 
 ### Integration in Code
