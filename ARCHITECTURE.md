@@ -36,6 +36,13 @@ The user interface for monitoring and control.
     *   Budget Top-up integration.
     *   Per-Agent cost attribution.
 
+### 3. The Notifier (Proactive Alerts) - *Sếp's Special*
+Designed to keep the "Sếp" (Boss) informed before things go critical.
+
+*   **Role:** Proactive notification layer via Telegram.
+*   **Trigger:** Activated when the `Interceptor` detects that usage has reached **80%** of the defined limit.
+*   **Benefit:** Zero-surprise operation. Sếp gets an alert on their phone before any requests are actually blocked, allowing for manual limit increases or task reprioritization.
+
 ## 🔄 Data Flow Diagram
 
 ```mermaid

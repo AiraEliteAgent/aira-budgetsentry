@@ -1,0 +1,17 @@
+{
+  "name": "aira-budgetsentry",
+  "version": "1.0.0",
+  "description": "A lightweight budget guard for Aira and other AI agents. Prevents cost-overruns before they happen.",
+  "main": "src/index.js",
+  "bin": {
+    "budgetsentry": "bin/budgetsentry"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aira Elite",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

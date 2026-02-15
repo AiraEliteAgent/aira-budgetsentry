@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+
+/**
+ * BudgetSentry CLI Entry Point
+ * Part of the Aira BudgetSentry Skill
+ */
+
+const { BudgetSentry } = require('../src/index');
+
+const args = process.argv.slice(2);
+const command = args[0] || 'status';
+
+const sentry = new BudgetSentry();
+
+async function main() {
+  switch (command) {
+    case 'status':
+      const usage = await sentry.getUsage();
+      console.log(`[BudgetSentry] Current usage: $${usage.spent} / $${usage.limit} (${usage.percent}% used)`);
+      break;
+    case 'check':
+      const cost = parseFloat(args[1] || '0');
+      const isAllowed = await sentry.checkSpend(cost);
+      if (isAllowed) {
+        console.log(`[BudgetSentry] OK: Proceed with cost $${cost}`);
+      } else {
+        console.error(`[BudgetSentry] BLOCKED: Adding $${cost} would exceed safety limit.`);
+        process.exit(1);
+      }
+      break;
+    default:
+      console.log('Usage: budgetsentry [status|check <amount>]');
+  }
+}
+
+main().catch(err => {
+  console.error('[BudgetSentry] Error:', err.message);
+  process.exit(1);
+});

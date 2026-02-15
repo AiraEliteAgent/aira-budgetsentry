@@ -15,6 +15,7 @@ As AI agents become more autonomous, the risk of "token runaway" increases. Infi
 2.  **Evaluating** the request against a dynamic budget policy.
 3.  **Optimizing** the payload (context compression) if limits are approaching.
 4.  **Rejecting** requests that violate hard caps.
+5.  **Proactive Reporting:** Sends instant Telegram alerts to Sếp when budget reaches 80%, ensuring no surprises.
 
 ## 🚀 Installation
 
