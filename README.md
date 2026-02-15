@@ -1,68 +1,62 @@
-# 🛡️ Aira BudgetSentry
+# BudgetSentry 🛡️
 
-> **Autonomous resource & cost governor for OpenClaw agents. Stop the token burn.**
+Production-grade budget monitoring and token usage tracking for Aira Agents.
 
-BudgetSentry is a critical infrastructure module designed to monitor, intercept, and optimize the resource consumption of OpenClaw autonomous agents. It acts as a financial firewall, ensuring that AI agents operate within defined budgetary constraints without sacrificing performance.
+## 🛡️ Protecting Sếp's Wallet
 
-![Status](https://img.shields.io/badge/Status-Active_Development-brightgreen?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+BudgetSentry is designed to prevent "bill shocks" by implementing a strict middleware layer between the Agent and the LLM APIs.
 
-## 📖 Overview
-
-As AI agents become more autonomous, the risk of "token runaway" increases. Infinite loops, excessive tool usage, and unoptimized context windows can drain credits in minutes. BudgetSentry solves this by:
-
-1.  **Intercepting** every LLM request before it hits the provider API.
-2.  **Evaluating** the request against a dynamic budget policy.
-3.  **Optimizing** the payload (context compression) if limits are approaching.
-4.  **Rejecting** requests that violate hard caps.
-5.  **Proactive Reporting:** Sends instant Telegram alerts to Sếp when budget reaches 80%, ensuring no surprises.
+### How it works:
+1.  **Pre-flight Check (`canSpend`):** Before making any API call, the agent checks if the estimated cost fits within the daily budget. If not, the request is blocked and an alert is sent.
+2.  **Usage Logging (`logSpend`):** Every single request is logged with its exact token count and calculated cost based on up-to-date pricing constants.
+3.  **Real-time Alerts:** Integrated with Telegram to notify Sếp immediately when budget milestones (80%) or limits (100%) are reached.
+4.  **Transparent CLI:** Sếp can check usage stats and adjust limits anytime using the `budgetsentry` command.
 
 ## 🚀 Installation
 
-BudgetSentry is designed to be a drop-in middleware for the OpenClaw runtime.
-
 ```bash
-# Clone the repository
-git clone https://github.com/AiraEliteAgent/aira-budgetsentry.git
-
-# Install dependencies
 cd aira-budgetsentry
 npm install
-
-# Link to OpenClaw
-npm link
 ```
 
-### Configuration
-Add the following to your `openclaw.json` or agent configuration:
+## 🛠️ Usage
 
-```json
-{
-  "modules": {
-    "budgetSentry": {
-      "enabled": true,
-      "dailyLimitUSD": 5.00,
-      "warningThreshold": 0.8,
-      "strategy": "aggressive_compression"
-    }
+### CLI Commands
+
+```bash
+# Check current status
+./bin/budgetsentry status
+
+# Set daily limit to $10.00
+./bin/budgetsentry set-limit 10.00
+
+# View usage logs
+./bin/budgetsentry logs
+```
+
+### Integration in Code
+
+```javascript
+const Interceptor = require('./src/core/Interceptor');
+const guard = new Interceptor();
+
+async function callLLM(prompt) {
+  // 1. Check if we have budget
+  if (!(await guard.canSpend(0.01))) {
+     throw new Error("Budget exceeded!");
   }
+  
+  // 2. Make the call...
+  const response = await api.chat(prompt);
+  
+  // 3. Log the damage
+  await guard.logSpend(response.model, response.usage.input, response.usage.output);
 }
 ```
 
-## 📊 Dashboard Guide
+## 📊 Pricing Constants
 
-The BudgetSentry Dashboard provides real-time telemetry on agent spending.
+Stored in `src/constants/pricing.js`. Updated regularly to reflect the latest market rates for Gemini, GPT, and Claude models.
 
--   **Live Cost Ticker:** Shows current session spend vs. daily limit.
--   **Token Heatmap:** Identifies which agents/tools are burning the most tokens.
--   **Intervention Log:** A record of every time BudgetSentry modified or blocked a request.
-
-To launch the dashboard:
-```bash
-npm run dashboard
-```
-Access it at `http://localhost:3000`.
-
-## 🤝 Contributing
-
-We welcome contributions from the OpenClaw community. Please read `CONTRIBUTING.md` before submitting a pull request.
+---
+*Built with ❤️ by Sentinel for Aira Elite Agents.*

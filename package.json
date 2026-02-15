@@ -1,17 +1,19 @@
 {
   "name": "aira-budgetsentry",
   "version": "1.0.0",
-  "description": "A lightweight budget guard for Aira and other AI agents. Prevents cost-overruns before they happen.",
-  "main": "src/index.js",
+  "description": "Production-grade budget monitoring and token usage tracking for Aira.",
+  "main": "src/core/Interceptor.js",
   "bin": {
     "budgetsentry": "bin/budgetsentry"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/manual_test.js"
   },
-  "author": "Aira Elite",
-  "license": "MIT",
   "dependencies": {
-    "axios": "^1.6.0"
-  }
+    "commander": "^11.0.0",
+    "sqlite3": "^5.1.6",
+    "dotenv": "^16.3.1"
+  },
+  "author": "Sentinel (Aira Elite Agent)",
+  "license": "MIT"
 }

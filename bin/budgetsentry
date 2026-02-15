@@ -1,39 +1,92 @@
 #!/usr/bin/env node
 
-/**
- * BudgetSentry CLI Entry Point
- * Part of the Aira BudgetSentry Skill
- */
+const { Command } = require('commander');
+const Interceptor = require('../src/core/Interceptor');
+const path = require('path');
 
-const { BudgetSentry } = require('../src/index');
+const program = new Command();
+const interceptor = new Interceptor();
 
-const args = process.argv.slice(2);
-const command = args[0] || 'status';
+program
+  .name('budgetsentry')
+  .description('Budget monitoring CLI for Aira Elite Agents')
+  .version('1.0.0');
 
-const sentry = new BudgetSentry();
+program
+  .command('status')
+  .description('Show current budget status')
+  .action(async () => {
+    try {
+      const status = await interceptor.getStatus();
+      console.log('\n--- 💰 Budget Status ---');
+      console.log(`Today's Spend: $${status.spent.toFixed(4)}`);
+      console.log(`Daily Limit:   $${status.limit.toFixed(2)}`);
+      console.log(`Remaining:     $${status.remaining.toFixed(4)}`);
+      console.log(`Usage:         ${status.percent.toFixed(1)}%`);
+      console.log('------------------------\n');
+      process.exit(0);
+    } catch (err) {
+      console.error('Error:', err.message);
+      process.exit(1);
+    }
+  });
 
-async function main() {
-  switch (command) {
-    case 'status':
-      const usage = await sentry.getUsage();
-      console.log(`[BudgetSentry] Current usage: $${usage.spent} / $${usage.limit} (${usage.percent}% used)`);
-      break;
-    case 'check':
-      const cost = parseFloat(args[1] || '0');
-      const isAllowed = await sentry.checkSpend(cost);
-      if (isAllowed) {
-        console.log(`[BudgetSentry] OK: Proceed with cost $${cost}`);
-      } else {
-        console.error(`[BudgetSentry] BLOCKED: Adding $${cost} would exceed safety limit.`);
-        process.exit(1);
-      }
-      break;
-    default:
-      console.log('Usage: budgetsentry [status|check <amount>]');
-  }
-}
+program
+  .command('set-limit')
+  .description('Set a new daily budget limit (USD)')
+  .argument('<amount>', 'Limit amount in USD')
+  .action(async (amount) => {
+    try {
+      const limit = parseFloat(amount);
+      if (isNaN(limit)) throw new Error('Invalid amount');
+      await interceptor.init();
+      await interceptor.storage.setDailyLimit(limit);
+      console.log(`✅ Daily limit updated to $${limit.toFixed(2)}`);
+      process.exit(0);
+    } catch (err) {
+      console.error('Error:', err.message);
+      process.exit(1);
+    }
+  });
 
-main().catch(err => {
-  console.error('[BudgetSentry] Error:', err.message);
-  process.exit(1);
-});
+program
+  .command('logs')
+  .description('View recent usage logs')
+  .option('-l, --limit <number>', 'Number of logs to show', 10)
+  .action(async (options) => {
+    try {
+      await interceptor.init();
+      const logs = await interceptor.storage.getLogs(parseInt(options.limit));
+      console.log('\n--- 📝 Recent Logs ---');
+      console.table(logs.map(l => ({
+        Time: l.timestamp,
+        Model: l.model,
+        'In': l.tokens_in,
+        'Out': l.tokens_out,
+        Cost: `$${l.cost.toFixed(5)}`
+      })));
+      process.exit(0);
+    } catch (err) {
+      console.error('Error:', err.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('log-usage')
+  .description('Manually log usage (for testing)')
+  .argument('<model>', 'Model name')
+  .argument('<in>', 'Input tokens')
+  .argument('<out>', 'Output tokens')
+  .action(async (model, input, output) => {
+    try {
+      const cost = await interceptor.logSpend(model, parseInt(input), parseInt(output));
+      console.log(`✅ Logged usage for ${model}. Cost: $${cost.toFixed(5)}`);
+      process.exit(0);
+    } catch (err) {
+      console.error('Error:', err.message);
+      process.exit(1);
+    }
+  });
+
+program.parse();
