@@ -29,7 +29,11 @@ if [ -L "$SKILLS_DIR/budgetsentry" ]; then
 fi
 ln -s "$INSTALL_PATH" "$SKILLS_DIR/budgetsentry"
 
-# 5. Restart Gateway
+# 5. Set up the Watcher Cron job (Automatic Token Tracking)
+echo "🕵️ Setting up BudgetWatcher..."
+(crontab -l 2>/dev/null | grep -v "Watcher.js"; echo "* * * * * node $INSTALL_PATH/src/core/Watcher.js") | crontab -
+
+# 6. Restart Gateway
 echo "🔄 Activating Slash Commands..."
 openclaw gateway restart
 
