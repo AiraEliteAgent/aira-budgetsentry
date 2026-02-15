@@ -2,70 +2,45 @@
 
 Production-grade budget monitoring and token usage tracking for Aira Agents.
 
-## 🛡️ Protecting Sếp's Wallet
+## 🛡️ Protecting Your Wallet
 
-BudgetSentry is designed to prevent "bill shocks" by implementing a strict middleware layer between the Agent and the LLM APIs.
+BudgetSentry is an autonomous resource & cost governor for OpenClaw agents. It prevents "bill shocks" by implementing a strict middleware layer between the Agent and the LLM APIs.
 
-### How it works:
-1.  **Pre-flight Check (`canSpend`):** Before making any API call, the agent checks if the estimated cost fits within the daily budget. If not, the request is blocked and an alert is sent.
-2.  **Usage Logging (`logSpend`):** Every single request is logged with its exact token count and calculated cost based on up-to-date pricing constants.
-3.  **Real-time Alerts:** Integrated with Telegram to notify Sếp immediately when budget milestones (80%) or limits (100%) are reached.
-4.  **Transparent CLI:** Sếp can check usage stats and adjust limits anytime using the `budgetsentry` command.
+### Key Features:
+- 🛑 **Pre-flight Checks:** Blocks expensive requests before they cost money.
+- 📝 **Live Logging:** Precise token accounting saved to a local SQLite database.
+- 🚨 **Proactive Alerts:** Automatically notifies you via Telegram when budget is > 80%.
+- 🎭 **Persona-Aware:** Adapts its notification tone to match your agent's personality.
+- ⌨️ **Slash Command Ready:** Integrated `/budgetsentry` command for instant status reports.
 
-## 🚀 Installation
+## 🚀 Installation (Auto-Slash Command)
+
+To ensure the `/budgetsentry` command appears automatically in your Telegram menu, clone the repository directly into your OpenClaw skills directory:
 
 ```bash
-# Clone the repository from Aira's Official HQ
-git clone https://github.com/AiraEliteAgent/aira-budgetsentry.git
+# Clone directly into skills folder
+git clone https://github.com/AiraEliteAgent/aira-budgetsentry.git ~/.openclaw/skills/budgetsentry
 
-# Enter the directory
-cd aira-budgetsentry
+# Enter directory and install dependencies
+cd ~/.openclaw/skills/budgetsentry && npm install
 
-# Install internal powers
-npm install
-
-# Link the CLI tool globally
-npm link
+# Restart gateway to activate the Slash Command
+openclaw gateway restart
 ```
 
 ## 🛠️ Usage
 
-### CLI Commands
+### CLI & Slash Commands
+Once installed, you can use the following commands directly in chat:
 
 ```bash
-# Check current status
-budgetsentry status
-
-# Set daily limit to $10.00
-budgetsentry set-limit 10.00
-
-# View usage logs
-budgetsentry logs
+/budgetsentry          # Show current usage and remaining budget
+/budgetsentry logs     # View recent transaction history
+/budgetsentry set-limit 5.0  # Update your daily limit to $5.00
 ```
 
-### Integration in Code
-
-```javascript
-const Interceptor = require('./src/core/Interceptor');
-const guard = new Interceptor();
-
-async function callLLM(prompt) {
-  // 1. Check if we have budget
-  if (!(await guard.canSpend(0.01))) {
-     throw new Error("Budget exceeded!");
-  }
-  
-  // 2. Make the call...
-  const response = await api.chat(prompt);
-  
-  // 3. Log the damage
-  await guard.logSpend(response.model, response.usage.input, response.usage.output);
-}
-```
-
-## 📊 Pricing Constants
-
-Stored in `src/constants/pricing.js`. Updated regularly to reflect the latest market rates for Gemini, GPT, and Claude models.
+## 📊 Technical Architecture
+Detailed in `ARCHITECTURE.md`. Includes an Interceptor, a Storage module (SQLite), and a Notifier system.
 
 ---
-*Built with ❤️ by Sentinel for Aira Elite Agents.*
+*Built with ❤️ by AiraEliteAgent for the OpenClaw Community.*
